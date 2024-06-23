@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+<style>
+button .return {
+    margin-top:2px;
+    margin-left:2px;
+    width: auto;
+    height:auto;
+    position: relative;
+    border-radius:10px; 
+};
+
+.p2 p{
+    display: inline;
+    color:rgba(130, 131, 132, 0.617)
+};
+
+.page {
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff;
+    position:absolute;
+};
+
+.container {
+    width: 95vw;
+    position: relative;
+    transform: translateX(-50%);
+    left: 50%;
+    top: 10px;
+    background-color: #ffffff;
+    box-shadow: 5px 20px 40px rgba(0, 0, 0, 0.1);
+  }
+  
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+h3 {
+  background-color: #e4e9fd;
+  text-align: center;
+  padding: 15px 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+.tab-content {
+  background-color: #ffffff;
+  padding: 50px 40px;
+}
+.tab-content h4 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #000224;
+  font-weight: 600;
+}
+.tab-content p {
+  text-align: justify;
+  line-height: 1.9;
+  letter-spacing: 0.4px;
+  color: #202238;
+}
+.tab-content div {
+  display: none;
+}
+.tab-content .active {
+  display: block;
+}
+.tabs .active {
+  background-color: #ffffff;
+  color: #08401c;
+}
+/* data entry formatting */
+input[type=text], select, input[type=number] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+[type=submit], button {
+    position: relative;
+  width: 100%;
+  background-color: #e1e2e1;
+  color: rgb(0, 0, 0);
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+};
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+div {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+};
+/* results formatting */
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  position:absolute;
+  align-self: center;
+
+}
+tr:nth-child(even) {
+  background-color: #ffffff;
+}
+th {
+  border: 1px solid #dddddd;
+  text-align: center;
+  padding: 8px;
+  font-size: 20px;
+}
+td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  font-size: 15px;
+};
+/* Edit and delete options */
+
+#deleteButton button{
+    display: block;
+    background-color: #f05f5f;
+    padding: 2px;
+    color: #f05f5f;
+};
+#deleteButton button:hover {
+    background-color: #f00606;
+};
+
+#editButton button{
+    display: block;
+    background: #699dc0;
+    padding: 2px;
+    color: #699dc0;
+};
+#deleteButton button:hover {
+    background-color: #259dff;
+};
+</style>
+<body>
+    <div id="page1" style="width:100vw;height:100vh;background-color:#ffffff;display: block;">
+    <div class="container" id="enterForm" style="position:absolute;width:60vw;">
+        <div class="container" id="chooseWindow" style="position:absolute;width:50vw;display:none;left:25vw;">
+            <form action="" id="OptionsForm">
+                <input type="text" id="opts" class="form-control" placeholder="Enter selection options as comma-separated list">
+                <input type="submit" id="enterOpts">
+            </form>
+        </div>
+    <form action="" id="makeForm">
+    <p>Data label</p>
+    <form action="" id="dataForm">
+    <input type="text" id="category" class="form-control" placeholder="Enter data category (e.g. Species)">
+    <p>Entry type</p>
+    <select id="type" class="form-control" placeholder="Select entry type">
+        <option value="text">Text</option>
+        <option value="select">Selection</option>
+        <option value="number">Number</option>
+        <!-- <option value="check">Checkbox</option> -->
+    </select>
+    <button id="catEntry"> Save category</button>
+    </form>
+    <form action="" id="dataFormGo">
+    <button id="start"> Start survey</button>
+    </form>
+</div>
+    <div class="container" id="Entries" style="position:relative;width:35vw;margin-left: auto;margin-right: 2px;">
+    <table id="tableCats" style="align-self: center;">
+
+    </table>
+</div>
+</div>
+
+<div id="page2" style="width:100vw;height:100vh;background-color:#ffffff;display: none;">
+    <button class="return" style="width:auto;height:auto;" id="ButtonReturn">
+        <p> return to set up </p>
+    </button>
+    <div class="container">
+        <div class="tabs">
+            <!-- tab labels -->
+            <h3 class="active">Enter data</h3>
+            <h3>See entered data</h3>
+          </div>
+             <!-- set up entry tab -->
+        <div class="tab-content">
+            <div class="active">
+              <h4>Observation</h4>
+              <form action="" id="dataForm">
+                  <!-- <input type="text" id="Species" class="form-control" placeholder="Enter species...">
+                  <input type="text" id="Behaviour" class="form-control" placeholder="Enter behaviour..."> 
+                  <button type="submit">Submit</button> -->
+                </form>
+            </div>
+            <!-- entry fields -->
+          <div id="recordingTab">
+            
+            <table id="dataRecord">
+                <div class="ewindow" style="display:none;" id="editingTab"> </div>
+            </table>
+          </div>
+        </div>
+      </div>
+</div>
+</body>
+<script>
+
+    const catList = [];
+    
+    let catEntry = document.getElementById("catEntry");
+    
+    catEntry.addEventListener("click", (e) => {
+      e.preventDefault();
+    let category = document.getElementById("category");
+    let type = document.getElementById("type");
+    let opts = document.getElementById("opts");
+    if (category.value=="" || type.value=="") {alert("Please choose a label and type!")}
+    else {
+        if (type.value=="select") {
+            var choices = document.getElementById("chooseWindow"); choices.setAttribute("style", "position:absolute;width:50vw;display:block;left:25vw;z-index:100;");
+            let enterOpts = document.getElementById("enterOpts");
+            enterOpts.addEventListener("click", (e) => {
+                e.preventDefault();
+                let opts = document.getElementById("opts");
+                const rowOptChange = document.getElementById("tableCats");
+                    const tr = rowOptChange.rows[rowOptChange.rows.length-1];
+                    const td = tr.cells[2];
+                    td.appendChild(document.createTextNode(opts.value));
+                choices.setAttribute("style", "position:absolute;width:50vw;display:none;left:25vw;z-index:100;");
+                opts.value="";
+            });
+            }
+        const ColumnEntered =  [{Category: String(category.value), Type: String(type.value), Options: String(opts.value)},];
+        
+        EntriesToColumns(ColumnEntered);
+        let windowResize = document.getElementById("enterForm");
+            windowResize.setAttribute("width", "60vw");
+        category.value = "";
+        type.value = "";}
+        });
+    
+    
+    
+    
+    
+/*-------------------------------------
+Start entering the data
+---------------------------------------*/
+let dataFormGo = document.getElementById("dataFormGo");
+const CatList = [{Category: '', Type: '', Options:''},];
+dataFormGo.addEventListener("click", (e) => {
+  e.preventDefault();
+
+let CatTable = document.getElementById("tableCats");
+const numberCategories = CatTable.rows.length;
+const addtoform = document.getElementById("dataForm");
+addtoform.innerHTML = '';
+
+for (let i = 1; i < numberCategories; i++) {
+    const cat = CatTable.rows[i].cells[0].innerHTML;
+    const typ = CatTable.rows[i].cells[1].innerHTML;
+    const opt = CatTable.rows[i].cells[2].innerHTML;
+    const Column = {Category: String(cat), Type: String(typ), Options: String(opt)};
+    CatList.push(Column);
+
+    if (typ=="text") {
+    const NewEntry = document.createElement('input'); NewEntry.setAttribute("type", "text");
+    NewEntry.setAttribute("id", String(cat));
+        NewEntry.setAttribute("placeholder", String(cat));
+    addtoform.appendChild(NewEntry);
+    }
+    if (typ=="select") {
+    const NewEntry = document.createElement('select');
+    const SelectOpts = opt.split(',');
+    SelectOpts.forEach(item => {
+        const NewOpt = document.createElement('option'); NewOpt.setAttribute("value", String(item));
+        NewOpt.appendChild(document.createTextNode(item));
+        NewEntry.setAttribute("id", String(cat));
+        NewEntry.setAttribute("placeholder", String(cat));
+        NewEntry.appendChild(NewOpt);
+    });
+    addtoform.appendChild(NewEntry);
+    }
+    if (typ=="number") {
+    const NewEntry = document.createElement('input'); NewEntry.setAttribute("type", "number");
+    NewEntry.setAttribute("id", String(cat));
+        NewEntry.setAttribute("placeholder", String(cat));
+    addtoform.appendChild(NewEntry);
+    }
+    /*if (typ=="checkbox") {
+    const NewEntry = document.getElementById("dataForm").createElement('input'); NewEntry.setAttribute("type", "checkbox");
+    NewEntry.setAttribute("name", "checkbox"); NewEntry.setAttribute("value", "checkbox");
+    NewEntry.setAttribute("id", String(cat));
+        NewEntry.setAttribute("placeholder", String(cat));
+    addtoform.appendChild(NewEntry);
+    } */
+    }
+    
+const SetUpPage1 = document.getElementById("page1"); SetUpPage1.setAttribute("style", "width:100vw;height:100vh;background-color:#ffffff;display: none;");
+const SetUpPage2 = document.getElementById("page2"); SetUpPage2.setAttribute("style", "width:100vw;height:100vh;background-color:#ffffff;display: block;");
+
+
+const subButton = document.createElement('button'); subButton.setAttribute("type", "submit");
+    subButton.setAttribute("id", "submitObservation"); 
+    subButton.appendChild(document.createTextNode("Submit"));
+    addtoform.appendChild(subButton);
+
+dataForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  let now = new Date(); let dateHour = now.getHours();
+  const Enterdata =  
+    [{Time: String(now), },];
+
+    for (let i=1 ; i<CatList.length; i++) {
+    var cat = CatList[i].Category;
+
+        let entered = document.getElementById(String(cat));
+        Enterdata[0][cat] = entered.value;
+
+    entered.value = "";
+
+  };
+
+/*-------------------------------------
+If minimal info missing, create alert
+otherwise, save data
+---------------------------------------*/
+
+    DataToTable(Enterdata);
+});
+
+});
+
+
+/*-------------------------------------
+Return button
+---------------------------------------*/
+
+let ButtonReturn = document.getElementById("ButtonReturn");
+ButtonReturn.addEventListener("click", (e) => {
+  e.preventDefault();
+
+    const SetUpPage1 = document.getElementById("page1"); SetUpPage1.setAttribute("style", "width:100vw;height:100vh;background-color:#ffffff;display: block;");
+    const SetUpPage2 = document.getElementById("page2"); SetUpPage2.setAttribute("style", "width:100vw;height:100vh;background-color:#ffffff;display: none;");
+
+});
+    
+    
+    
+/*-------------------------------------
+Function to show entered categories, and allow delete or edits
+---------------------------------------*/
+    function editWindow(table, whichRow) {
+        var butnID = document.getElementById("editButton"+String(whichRow));
+        var editRow = table.rows[whichRow];
+        if (butnID.innerText == "edit") {
+        butnID.innerText="save";
+        for (let i = 0; i < table.rows[0].cells.length+2; i++) {
+            table.rows[whichRow].cells[i].setAttribute("contenteditable", 'true');
+            editRow.cells[i].setAttribute("style", 'color:red');
+            for (let n = 1; n < table.rows.length; n++) {
+                for (let m = 0; m < table.rows[0].cells.length+2; m++) {
+            table.rows[n].cells[m].setAttribute("style", 'visibility:hidden');}};
+            for (let m = 0; m < table.rows[0].cells.length; m++) {
+            editRow.cells[m].setAttribute("style", 'visibility:visible')};
+            editRow.cells[i].setAttribute("style", 'color:red');
+        }}
+        else if (butnID.innerText == "save") {
+        butnID.innerText="edit";
+        for (let i = 0; i < table.rows[0].cells.length; i++) {
+            table.rows[whichRow].cells[i].setAttribute("contenteditable", 'false');
+        for (let n = 1; n < table.rows.length; n++) {
+                for (let m = 0; m < table.rows[0].cells.length+2; m++) {
+            table.rows[n].cells[m].setAttribute("style", 'visibility:vissible');}};
+            editRow.cells[i].setAttribute("style", 'color:black');
+        }};
+    };
+    
+    function EntriesToColumns(heading) {
+        const tableCats = document.getElementById("tableCats");
+        tableCats.setAttribute('border', '1');
+     
+                const headerRow = document.createElement('tr');
+                Object.keys(heading[0]).forEach(key => {
+                    const th = document.createElement('th');
+                    th.appendChild(document.createTextNode(key));
+                    headerRow.appendChild(th);
+                })
+                if (tableCats.rows.length==0) {
+                tableCats.appendChild(headerRow)};
+                heading.forEach(item => {
+                    const row = document.createElement('tr');
+                    Object.values(item).forEach(value => {
+                        const td = document.createElement('td');
+                        td.appendChild(document.createTextNode(value));
+                        row.appendChild(td);
+                    });
+                    var btnDel = document.createElement('button');
+                        btnDel.innerText="delete";
+                        btnDel.setAttribute("class", "deleteButton");
+                        btnDel.addEventListener("click", (e) => {
+                            let checkDel = confirm("Delete entry?");
+                                    if (checkDel ==true) {
+                                        const cellplace = e.target.closest("tr");
+                                        tableCats.deleteRow(Number(cellplace.rowIndex));
+                                     }});
+                    const tdDel = document.createElement('td');
+                        tdDel.appendChild(btnDel);
+                        row.appendChild(tdDel);
+                    var btnEdt = document.createElement('button');
+                        btnEdt.innerText="edit";
+                        btnEdt.setAttribute("class", "editButton");
+                        btnEdt.setAttribute("id", "editButton"+String(tableCats.rows.length));
+                        btnEdt.addEventListener("click", (e) => {
+                                        const cellplace = e.target.closest("tr");
+                                        editWindow(tableCats, Number(cellplace.rowIndex));
+                                     });
+                    const tdEdt = document.createElement('td');
+                        tdEdt.appendChild(btnEdt);
+                        row.appendChild(tdEdt);
+                    tableCats.appendChild(row);
+                });
+                if (tableCats.rows.length==0) {
+                    tableCats.appendChild(tableCats);}};
+    
+/*-------------------------------------
+Input and output tabs
+---------------------------------------*/
+let tabs = document.querySelectorAll(".tabs h3");
+let tabContents = document.querySelectorAll(".tab-content div");
+
+tabs.forEach((tab, index) => {
+  tab.addEventListener("click", () => {
+    tabContents.forEach((content) => {
+      content.classList.remove("active");
+    });
+    tabs.forEach((tab) => {
+      tab.classList.remove("active");
+    });
+    tabContents[index].classList.add("active");
+    tabs[index].classList.add("active");
+  });
+});
+
+let dataForm = document.getElementById("dataForm");
+const formData = new FormData();
+
+let dataRecord = document.getElementById("dataRecord");
+
+
+function editWindow(table, whichRow) {
+    var butnID = document.getElementById("editButton"+String(whichRow));
+    var editRow = table.rows[whichRow];
+    if (butnID.innerText == "edit") {
+    butnID.innerText="save";
+    for (let i = 0; i < table.rows[0].cells.length+2; i++) {
+        table.rows[whichRow].cells[i].setAttribute("contenteditable", 'true');
+        editRow.cells[i].setAttribute("style", 'color:red');
+        for (let n = 1; n < table.rows.length; n++) {
+            for (let m = 0; m < table.rows[0].cells.length+2; m++) {
+        table.rows[n].cells[m].setAttribute("style", 'visibility:hidden');}};
+        for (let m = 0; m < table.rows[0].cells.length; m++) {
+        editRow.cells[m].setAttribute("style", 'visibility:visible')};
+        editRow.cells[i].setAttribute("style", 'color:red');
+    }}
+    else if (butnID.innerText == "save") {
+    butnID.innerText="edit";
+    for (let i = 0; i < table.rows[0].cells.length; i++) {
+        table.rows[whichRow].cells[i].setAttribute("contenteditable", 'false');
+    for (let n = 1; n < table.rows.length; n++) {
+            for (let m = 0; m < table.rows[0].cells.length+2; m++) {
+        table.rows[n].cells[m].setAttribute("style", 'visibility:vissible');}};
+        editRow.cells[i].setAttribute("style", 'color:black');
+    }};
+};
+
+
+function DataToTable(data) {
+    const table = document.getElementById("dataRecord");
+            table.setAttribute('border', '1');
+ 
+            const headerRow = document.createElement('tr');
+            Object.keys(data[0]).forEach(key => {
+                const th = document.createElement('th');
+                th.appendChild(document.createTextNode(key));
+                headerRow.appendChild(th);
+            });
+            if (table.rows.length==0) {
+            table.appendChild(headerRow)};
+ 
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                Object.values(item).forEach(value => {
+                    const td = document.createElement('td');
+                    td.appendChild(document.createTextNode(value));
+                    row.appendChild(td);
+                });
+                var btnDel = document.createElement('button');
+                    btnDel.innerText="delete";
+                    btnDel.setAttribute("class", "deleteButton");
+                    btnDel.addEventListener("click", (e) => {
+                        let checkDel = confirm("Delete entry?");
+                                if (checkDel ==true) {
+                                    const cellplace = e.target.closest("tr");
+                                    table.deleteRow(Number(cellplace.rowIndex));
+                                 }});
+                const tdDel = document.createElement('td');
+                    tdDel.appendChild(btnDel);
+                    row.appendChild(tdDel);
+                var btnEdt = document.createElement('button');
+                    btnEdt.innerText="edit";
+                    btnEdt.setAttribute("class", "editButton");
+                    btnEdt.setAttribute("id", "editButton"+String(table.rows.length));
+                    btnEdt.addEventListener("click", (e) => {
+                        EditOrSave = 0;
+                                    const cellplace = e.target.closest("tr");
+                                    editWindow(table, Number(cellplace.rowIndex));
+                                 });
+                const tdEdt = document.createElement('td');
+                    tdEdt.appendChild(btnEdt);
+                    row.appendChild(tdEdt);
+                table.appendChild(row);
+            });
+            if (table.rows.length==0) {
+        dataRecord.appendChild(table);}};
+
+
+    </script>
+</html>
