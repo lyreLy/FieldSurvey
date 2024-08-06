@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+<style>
+html, body {
+  margin: 0;
+}
+html { overflow-x: scroll; }
+
+p {
+  text-align: justify;
+  line-height: 1.9;
+  letter-spacing: 0.4px;
+  color: #202238;
+}
+html {
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+  font-family: 'FeuraSans', sans-serif;
+}
+
+body {
+  width: 100%;
+  height: inherit;
+  overflow: hidden;
+}
+
+.container {
+  width: 90vw;
+  height: auto;
+  overflow-y:scroll;
+  margin-left: 5vw;
+  margin-top: 0wh;
+  font-size: 12px;
+}
+
+/* || positioning of other elements */
+
+h1 {
+  font-size: 2.5rem;
+  line-height: 4.8rem;
+  min-height: 5rem;
+  height: auto;
+  margin: 0;
+  padding-left: 0.5rem;
+  color: white;
+  background: url("../img/header.png") repeat-x scroll 0px 0px / auto 100% transparent;
+}
+
+button {
+  position: absolute;
+  height: auto;
+  border-radius: 60%;
+  background: url("../img/default.png") repeat-x scroll left bottom / auto 100% rgb(250, 250, 250); 
+  border: 0.1rem solid rgb(166, 166, 166);
+  border-radius: 0.2rem 0.2rem 0.2rem 0.2rem; 
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 3.8rem;
+  color: rgb(51, 51, 51);
+  text-align: center;
+  text-shadow: 0.1rem 0.1rem 0px rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  outline: medium none;
+}
+
+.enable {
+  top: 0.5rem;
+  right: 17.4rem;
+  margin-top:1%;
+  margin-right:1%;
+}
+
+.revoke {
+  top: 0.5rem;
+  right: 0.4rem;
+  margin-top:1%;
+  margin-right:1%;
+}
+
+/* Tabs */
+.tablink {
+  background-color: #afafb0;
+  color: rgb(0, 0, 0);
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  font-size: 17px;
+  width: 25%;
+}
+
+.tablink:hover {
+  background-color: #777;
+}
+
+.tabcontent {
+  display: none;
+  padding: 100px 20px;
+  height: 100%;
+}
+
+/* Edit and delete options */
+
+#deleteButton button{
+    display: block;
+    background-color: #f05f5f;
+    padding: 0px;
+    color: #f05f5f;
+    position: relative;
+    
+};
+#deleteButton button:hover {
+    background-color: #f00606;
+};
+
+#editButton button{
+    display: block;
+    background: #699dc0;
+    padding: 0px;
+    color: #699dc0;
+    position: absolute;
+    
+};
+#deleteButton button:hover {
+    background-color: #259dff;
+};
+
+/* results formatting */
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 80%;
+  position:absolute;
+  align-self: center;
+  overflow-x: scroll; 
+  padding: 2 2 2 2;
+}
+tr:nth-child(even) {
+  background-color: #ffffff;
+}
+th {
+  border: 1px solid #dddddd;
+  text-align: center;
+  padding: 8px;
+  font-size: 20px;
+}
+td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  font-size: 15px;
+  width:20px;
+};
+/* data entry formatting */
+input[type=text], select, input[type=number] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+    position: relative;
+  width: 100%;
+  background-color: #b5b5b5;
+  color: rgb(0, 0, 0);
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+};
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+div {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+};
+</style>
+<head>
+	<meta charset="UTF-8">
+	<title>BeeLog</title>
+    <meta name="viewport" content="width=device-width"> 
+	<link href="style/style.css" type="text/css" rel="stylesheet">
+	<script src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+</head>
+<body>
+    <!-- tab heads -->
+    <button class="tablink" onclick="openPage('Enter', this, 'lightblue')"  id="defaultOpen" style="position: relative;z-index:100;">Enter data</button>
+    <button class="tablink" onclick="openPage('preview', this, 'lightblue')" style="position: relative;z-index:100;">Preview entries</button>
+    <div id="preview" class="tabcontent">
+        <table id="dataRecord" style="position: absolute;width:auto;height:auto;">
+                
+        </table>
+        <button id="FinishAndSave" onclick="exportTableToExcel()" style="width:auto;height:auto;">Finish and save</button>
+    </div>
+<div id="Enter" class="tabcontent">
+<!-- entry fields -->
+ <div class="container" style="margin-left: 5vw;overflow-y: scroll;">
+    <!-- Empty div for coordinates -->
+    
+<button class="enable">Enable Geolocation</button>
+<button class="revoke">Revoke Geolocation</button>
+<button id="showPlants" style="width: auto;height: auto;margin-left:50%;margin-top:-7%;">Plant species</button>
+<button id="showBees" style="width: auto;height: auto;margin-left:60%;margin-top:-7%;">Bee species</button>
+
+<form action="" id="dataForm", style="margin-top: -2%;">
+
+    <p>Bee number: <input type="text" id="Bee number"></p>
+    <p>Latitude: <select id="Lat" class="form-control" placeholder="latitude">
+    </select></p>
+    <p>Longitude: <select id="Lon" class="form-control" placeholder="longitude">
+    </select></p>
+    
+    <p>Recording number: <input type="text" id="Recording number"></p>
+
+    <p>Pollen load: <input type="text" id="Pollen load"></p>
+
+    <p>Plant number: <input type="text" id="Plant number"></p>
+
+    <p>Revisit plant: <input type="checkbox" id="Revisit plant" value="true"></p>
+
+    <p>Inside plot: <input type="checkbox" id="Inside plot" value="true"></p>
+
+    <p>Distance: <input type="range" id="Distance"></p>
+
+    <p>Flower number: <input type="text" id="Flower number"></p>
+    <p>Revisit flower: <input type="text" id="Revisit flower"></p>
+    <p>Bee species: <select id="Bee species" class="form-control" placeholder="Bee species">
+    </select></p>
+    <p>Plant species: <select id="Plant species" class="form-control" placeholder="Plant species">
+    </select></p>
+    <p>Robbing: <input type="checkbox" id="Robbing" name="Robbing" value="true"></p>
+    <p>Foraging: <input type="checkbox" id="Foraging" name="Foraging" value="true"></p>
+    <input type="text" id="Notes" class="form-control" placeholder="Notes">
+    <input type="submit" id="enterObs">
+</form>
+<div id="beeImg" style="display:none;"></div>
+<div id="plantImg" style="display:none;"></div>
+</div>
+</div>
+</body>
+<script>
+// Bee and plant data from sheet
+var bees = [{ "Bumblebeespecies": "hortorum", "Swedishname": "Trädgårdshumla", "Similarspecies": "jonellus", "Liknandeart": "Ljunghumla", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/garden-bumblebee-queen-worker-male-identification.jpg"},
+{ "Bumblebeespecies": "hypnorum", "Swedishname": "Hushumla", "Similarspecies": null, "Liknandeart": null, link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/tree-bumblebee-queen-worker-male-identification.jpg"},
+{ "Bumblebeespecies": "lapidarius", "Swedishname": "Stenhumla", "Similarspecies": "ruderarius, sylvarum", "Liknandeart": "Gräshumla, Haghumla", link:"https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/red-tailed-bumblebee-queen-worker-male-identification.jpg"},
+{ "Bumblebeespecies": "lucorum/terrestris", "Swedishname": "jordhumlor", "Similarspecies": "magnus, cryptarum", "Liknandeart": "Kragjordhumla, Skogsjordhumla", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/Buff-tailed-test-1.jpg"},
+{ "Bumblebeespecies": "muscorum", "Swedishname": "Mosshumla", "Similarspecies": "humilis, pascuorum", "Liknandeart": "Backhumla, Åkerhumla", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/moss-carder-bumblebee-queen-worker-male-identification.jpg"}, 
+{ "Bumblebeespecies": "pascuorum", "Swedishname": "Åkerhumla", "Similarspecies": "humilis, muscorum", "Liknandeart": "Backhumla, Mosshumla", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/common-carder-bumblebee-queen-worker-male-identification.jpg"}, 
+{ "Bumblebeespecies": "pratorum", "Swedishname": "Ängshumla", "Similarspecies": null, "Liknandeart": null, link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/early-bumblebee-queen-worker-male-identification.jpg"},
+{ "Bumblebeespecies": "ruderarius", "Swedishname": "Gräshumla", "Similarspecies": "lapidarius", "Liknandeart": "Stenhumla", link:"https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/red-shanked-bumblebee-queen-worker-male-identification.jpg"}, 
+{ "Bumblebeespecies": "soroeensis", "Swedishname": "Blåklockshumla", "Similarspecies": "lucorum, terrestris", "Liknandeart": "jordhumlor", link:"https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/broken-belted-bumblebee-queen-worker-male-identification.jpg"}, 
+{ "Bumblebeespecies": "subterraneus", "Swedishname": "Vallhumla", "Similarspecies": null, "Liknandeart": null, link: "https://image.laji.fi/MM.154463/GP.89380_Bombus_subterraneus_f_1_thumb.jpg"},
+{ "Bumblebeespecies": "sylvarum", "Swedishname": "Haghumla", "Similarspecies": "(lapidurius)", "Liknandeart": "(Stenhumla)", link:"https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/shrill-carder-bumblebee-queen-worker-male-identification.jpg"}, 
+{ "Bumblebeespecies": "---", "Swedishname": null, "Similarspecies": null, "Liknandeart": null, link: null},
+{ "Bumblebeespecies": "barbutellus", "Swedishname": "Trädgårdssnylthumla", "Similarspecies": null, "Liknandeart": null, link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/barbuts-cuckoo-bumblebee-female-male-identification.jpg"}, 
+{ "Bumblebeespecies": "bohemicus", "Swedishname": "Jordsnylthumla", "Similarspecies": "vestalis", "Liknandeart": "Sydsnylthumla", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/gypsy-cuckoo-bumblebee-female-male-identification.jpg"}, 
+{ "Bumblebeespecies": "campestris", "Swedishname": "Åkersnylthumla", "Similarspecies": null, "Liknandeart": null, link:"https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/field-cuckoo-bumblebee-female-male-identification.jpg"}, 
+{ "Bumblebeespecies": "norvegicus", "Swedishname": "Hussnylthumla", "Similarspecies": "sylvestris", "Liknandeart": "Ängssnylthumla", link: "https://image.laji.fi/MM.2345168/Bombus_norvegicus_Q_EST_2022-02-24_21-01-19_large.jpg"}, 
+{ "Bumblebeespecies": "quadricolor", "Swedishname": "Broksnylthumla", "Similarspecies": null, "Liknandeart": null, link: "https://image.laji.fi/MM.2432296/quadricolor_M_large.jpg"}, 
+{ "Bumblebeespecies": "rupestris", "Swedishname": "Stensnylthumla", "Similarspecies": null, "Liknandeart": null, link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/red-tailed-cuckoo-bumblebee-female-male-identification.jpg"}, 
+{ "Bumblebeespecies": "sylvestris", "Swedishname": "Ängssnylthumla", "Similarspecies": "norvegicus", "Liknandeart": "Hussnylthumla", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/forest-cuckoo-bumblebee-female-male-identification.jpg"}, 
+{ "Bumblebeespecies": "vestalis", "Swedishname": "Sydsnylthumla", "Similarspecies": "bohemicus", "Liknandeart": "Jordsnylthumla", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/southern-cuckoo-bumblebee-female-male-identification.jpg"}, 
+{ "Bumblebeespecies": "UNKNOWN", "Swedishname": null, "Similarspecies": null, "Liknandeart": null, link: null}, 
+{ "Bumblebeespecies": "distinguendus", "Swedishname": "Klöverhumla", "Similarspecies": null, "Liknandeart": null, link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/great-yellow-bumblebee-queen-worker-male-identification.jpg"}, 
+{ "Bumblebeespecies": "humilis", "Swedishname": "Backhumla", "Similarspecies": "muscorum, pascuorum", "Liknandeart": "Mosshumla, Åkerhumla", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/brown-banded-carder-bumblebee-queen-worker-male-identification.jpg"}, 
+{ "Bumblebeespecies": "jonellus", "Swedishname": "Ljunghumla", "Similarspecies": "hortorum", "Liknandeart": "Trädgårdshumla", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/heath-bumblebee-queen-worker-male-identification.jpg"}, 
+{ "Bumblebeespecies": "terrestris", "Swedishname": "Mörk jordhumla", "Similarspecies": "lucorum", "Liknandeart": "ljusa jordhumlor", link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/Buff-tailed-test-1.jpg"}, 
+{ "Bumblebeespecies": "---", "Swedishname": null, "Similarspecies": null, "Liknandeart": null, link: null}, 
+{ "Bumblebeespecies": "Apis mellifera", "Swedishname": "honungsbi", "Similarspecies": null, "Liknandeart": null, link: "https://www.bumblebeeconservation.org/wp-content/uploads/2024/04/honeybees.jpg"}];
+var plants = [
+{ "Use": 0, "Family": "Lamiaceae", "Latin": "Thymus serpyllum", "Swedish": "Backtimjan", "English": "Breckland Thyme", "Portugese": null, "Colour": "Purple", link: "https://imgproxy.infoflora.ch/T8BDnN4If1iA30en2c-lUA/rs:fit:400:600:1/g:ce/aHR0cHM6Ly93d3cuaW5mb2Zsb3JhLmNoL2VuLy9hc3NldHMvZGJfZG9jL3NwZWNpZXMvdGF4YV9pbWFnZXMvMjAxMi8wNi8yMC8yMDEyMDYyMDAwMzU1NC0wZmJiYjg5ZS5qcGc.jpg"}, 
+{ "Use": 0, "Family": "Asteraceae", "Latin": "Pilosella officinarum", "Swedish": "Gråfibbla", "English": "Mouse-ear-hawkweed ", "Portugese": null, "Colour": "Yellow", link: "https://assets.artdatabanken.se/image/_5/76291_220279_5.jpg"}, 
+{ "Use": 0, "Family": "Fabaceae", "Latin": "Lathyrus linifolius", "Swedish": "Gökärt", "English": "Bitter-vetch", "Portugese": null, "Colour": "Purple", link: "https://imgproxy.infoflora.ch/F70EpK4xJ5i9dz2I19Yphw/rs:fit:400:600:1/g:ce/aHR0cHM6Ly93d3cuaW5mb2Zsb3JhLmNoL2VuLy9hc3NldHMvZGJfZG9jL3NwZWNpZXMvdGF4YV9pbWFnZXMvMjAxMi8wNi8xOS8yMDEyMDYxOTIzMzEyOC05MmI5YzhjNC5qcGc.jpg"}, 
+{ "Use": 0, "Family": "Rosaceae", "Latin": "Crataegus spp.", "Swedish": "Hagtorn", "English": "Hawthorn", "Portugese": null, "Colour": "White", link: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGaFkADCWAt_U_JkORJepiz3XJZe7_0uNvWQ&s"}, 
+{ "Use": 1, "Family": "Ranunculaceae", "Latin": "Ranunculus bulbosus", "Swedish": "Knölsmörblomma", "English": "Bulbous Buttercup ", "Portugese": null, "Colour": "Yellow", link: "https://plantis.info/wp-content/uploads/2021/12/Ranunculus-bulbosus.jpg"}, 
+{ "Use": 0, "Family": "Campanulaceae", "Latin": "Campanula rotundifolia", "Swedish": "Liten blåklocka", "English": "Harebell, Bluebell", "Portugese": null, "Colour": "Blue", link: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS59KWwpugHZcUU021X6_IFt_UK7yZ3curMcA&s"}, 
+{ "Use": 0, "Family": "Saxifragaceae", "Latin": "Saxifraga granulata", "Swedish": "Mandelblomma", "English": "Meadow Saxifrage ", "Portugese": null, "Colour": "White", link: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Saxifraga_granulata_140505.jpg"}, 
+{ "Use": 0, "Family": "Rosaceae", "Latin": "Geum urbanum", "Swedish": "Nejlikrot", "English": "Wood avens", "Portugese": null, "Colour": "Yellow", link: "https://plantis.info/wp-content/uploads/2021/12/Geum-urbanum-2.jpg"}, 
+{ "Use": 1, "Family": "Fabaceae", "Latin": "Trifolium pratense", "Swedish": "Rödklöver", "English": "Red clover", "Portugese": null, "Colour": "Red", link: "https://inaturalist-open-data.s3.amazonaws.com/photos/35545444/original.jpg"}, 
+{ "Use": 0, "Family": "Rubiaceae", "Latin": "Galium saxatile", "Swedish": "Stenmåra", "English": "Heath Bedstraw ", "Portugese": null, "Colour": "White", link: "https://imgproxy.infoflora.ch/Pnx0MFjK6DQBUapPV3iOvg/rs:fit:400:600:1/g:ce/aHR0cHM6Ly93d3cuaW5mb2Zsb3JhLmNoL2VuLy9hc3NldHMvZGJfZG9jL3NwZWNpZXMvdGF4YV9pbWFnZXMvMjAxMi8wNi8yMC8yMDEyMDYyMDAwMzA1OS0yNTZmYTAxNi5qcGc.jpg"}, 
+{ "Use": 0, "Family": "Caryophyllaceae", "Latin": "Lycnis viscaria", "Swedish": "Tjärblomster", "English": "Sticky catchfly", "Portugese": null, "Colour": "Purple", link: "https://upload.wikimedia.org/wikipedia/commons/1/16/Harilik_t%C3%B5rvalill_Lychnis_viscaria.jpg"}, 
+{ "Use": 1, "Family": "Fabaceae", "Latin": "Trifolium repens", "Swedish": "Vitklöver", "English": "White clover", "Portugese": null, "Colour": "White", link: "https://upload.wikimedia.org/wikipedia/commons/5/52/Trifolium_repens_-_white_clover_on_way_from_Govindghat_to_Gangria_at_Valley_of_Flowers_National_Park_-_during_LGFC_-_VOF_2019_%281%29.jpg"}, 
+{ "Use": 1, "Family": "z_none", "Latin": "zz_Other species", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: null}, 
+{ "Use": 1, "Family": null, "Latin": "Anthylis vulneraria", "Swedish": null, "English": null, "Portugese": null, "Colour": "Yellow", link: "https://newfs.s3.amazonaws.com/taxon-images-1000s1000/Fabaceae/anthyllis-vulneraria-fl-wciesla.jpg"}, 
+{ "Use": 1, "Family": null, "Latin": "vicia cracca", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: "https://upload.wikimedia.org/wikipedia/commons/b/b7/Tufted_vetch_close_800.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "Cerastium spp.", "Swedish": null, "English": null, "Portugese": null, "Colour": "white", link: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Cerastium_arvense_-_Acker-Hornkraut_Detail.JPG"}, 
+{ "Use": 0, "Family": null, "Latin": "Aegopodium podagraria", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: "https://plantis.info/wp-content/uploads/2021/12/Aegopodium-podagraria-1.jpg"}, 
+{ "Use": 1, "Family": null, "Latin": "Anchusa officinale", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSP3a0doGvhqjdkr0R8AEdl4XSg4xSDdbqRWg&s"}, 
+{ "Use": 0, "Family": null, "Latin": "Geranium robertium", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: "https://imgproxy.infoflora.ch/S0YnH7hSmi3MZ9w_kyzPBg/rs:fill:400:400:1/g:sm/aHR0cHM6Ly93d3cuaW5mb2Zsb3JhLmNoL2VuLy9hc3NldHMvZGJfZG9jL3NwZWNpZXMvdGF4YV9pbWFnZXMvMjAxMi8wNi8yMC8yMDEyMDYyMDAwMjAxNy04NTYzNDg0NC5qcGc.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "taraxacum spp.", "Swedish": null, "English": null, "Portugese": null, "Colour": "Yellow", link: "https://images.immediate.co.uk/production/volatile/sites/10/2018/02/61078405-281c-4a49-8d1e-2e445fe64960-378bd75.jpg?quality=90&resize=556,371"}, 
+{ "Use": 0, "Family": null, "Latin": "Cirsium palustre", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Cirsium_palustre_inflorescence_-_Niitv%C3%A4lja.jpg/1200px-Cirsium_palustre_inflorescence_-_Niitv%C3%A4lja.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "Lamium album", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: "https://www.ballyrobertgardens.com/cdn/shop/products/Lamium_album_1_nbrcg_wi_1024x1024.jpg?v=1549980797"}, 
+{ "Use": 0, "Family": null, "Latin": "Lycnis flos-cuculi", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMcl92kel_3nzLruAXpbDQKP0jixmEeKwvCQ&s"}, 
+{ "Use": 0, "Family": null, "Latin": "Rhinanthus minor", "Swedish": null, "English": null, "Portugese": null, "Colour": "Yellow", link: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Yellow-rattle_close_700.jpg/640px-Yellow-rattle_close_700.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "Geum rivale", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: "https://m.media-amazon.com/images/I/714zZIwczgL._AC_UF1000,1000_QL80_.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "Potentila argentea", "Swedish": null, "English": null, "Portugese": null, "Colour": "Yellow", link: "https://upload.wikimedia.org/wikipedia/commons/9/9c/Potentilla_argentea_1.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "Cardamine pratensis", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: "https://plantis.info/wp-content/uploads/2021/12/Cardamine-pratensis-2.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "carum carvi", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: "https://www.myseeds.co/cdn/shop/products/e_87d79cbc-288d-4666-9fe7-5ef1378cf0f9_1024x1024.jpg?v=1626109187"}, 
+{ "Use": 0, "Family": null, "Latin": "Polygala vulgaris", "Swedish": null, "English": null, "Portugese": null, "Colour": "Blue", link: "https://imgproxy.infoflora.ch/Nkb8wD3FKV-dktnirJlx-g/rs:fit:400:600:1/g:ce/aHR0cHM6Ly93d3cuaW5mb2Zsb3JhLmNoL2VuLy9hc3NldHMvZGJfZG9jL3NwZWNpZXMvdGF4YV9pbWFnZXMvMjAxMi8wNi8xOS8yMDEyMDYxOTIzMzQyNS01ODdkZmI5Ni5qcGc.jpg"}, 
+{ "Use": 1, "Family": null, "Latin": "cirsium heterophyllum", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAzhE38peu-NqPh3uPaBG3Z-tdH6GzqHC_-w&s"}, 
+{ "Use": 0, "Family": null, "Latin": "Lupinos arboreus", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: "https://upload.wikimedia.org/wikipedia/commons/b/bb/Arboreus_infl.jpg"}, 
+{ "Use": 1, "Family": null, "Latin": "Echium vulgare", "Swedish": null, "English": null, "Portugese": null, "Colour": "Blue", link: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Echium_vulgare_L.jpg/1200px-Echium_vulgare_L.jpg"}, 
+{ "Use": 1, "Family": null, "Latin": "Filipendula ulmaria", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: "https://www.specialplants.net/shop/images/products/large/1/filipendula_ulmaria.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "Mysotis spp.", "Swedish": null, "English": null, "Portugese": null, "Colour": "Blue", link: "https://www.illinoiswildflowers.info/weeds/photos/forget_not1.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "Belis perennis", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhkVQ_pTVPma8y05WQbexnbBf-hVc-sF3m3A&s"}, 
+{ "Use": 1, "Family": null, "Latin": "Chamaemelum nobile", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: "https://biodiversity.ly/wp-content/uploads/2023/06/DSC01954_1600-600x900.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "Galium palustre", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSj0HH8NOc49b1116nL8ppd5C5ZlQVhnBcdkQ&s"}, 
+{ "Use": 1, "Family": null, "Latin": "cirsium heterophyllum", "Swedish": null, "English": null, "Portugese": null, "Colour": "purple", link: "https://upload.wikimedia.org/wikipedia/commons/d/de/Cirsium_heterophyllum_-_villohakas.jpg"}, 
+{ "Use": 0, "Family": null, "Latin": "margarita", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: "https://images.ctfassets.net/3s5io6mnxfqz/4udcs2kZz77hi9Mrelqxwl/8583eddca239c0621f7740523094db34/AdobeStock_425399979.jpeg"}, 
+{ "Use": 0, "Family": null, "Latin": "veronica pratenses", "Swedish": null, "English": null, "Portugese": null, "Colour": "Blue", link: "https://www.wildflowersprovence.fr/media/plants/veronica-hederifolia-4edma.jpg?v=1628355467"}, 
+{ "Use": 1, "Family": null, "Latin": "crepis spp.", "Swedish": null, "English": null, "Portugese": null, "Colour": "Yellow", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "trifolium dubium", "Swedish": null, "English": null, "Portugese": null, "Colour": "Yellow", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Plantago lanceolata", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Stelaria spp.", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Camomila", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Aquillia vulgaris", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "centaurea spp.", "Swedish": null, "English": null, "Portugese": null, "Colour": "Blue", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Sedum spp.", "Swedish": null, "English": null, "Portugese": null, "Colour": "Yellow", link: null}, 
+{ "Use": 1, "Family": null, "Latin": "Centaurea scabiosa", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Papaver spp.", "Swedish": null, "English": null, "Portugese": null, "Colour": "Red", link: null}, 
+{ "Use": 1, "Family": null, "Latin": "Achillia milifolium", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Cirsium glomerato", "Swedish": null, "English": null, "Portugese": null, "Colour": "White", link: null}, 
+{ "Use": 1, "Family": null, "Latin": "Chamerion angustifolium", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Pachelia tanacetifolia", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: null}, 
+{ "Use": 1, "Family": null, "Latin": "salvia pratensis", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Stachys sylvatica", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: null}, 
+{ "Use": 1, "Family": null, "Latin": "Globularia vulgaris", "Swedish": null, "English": null, "Portugese": null, "Colour": "Blue", link: null}, 
+{ "Use": 1, "Family": null, "Latin": "Trifolium campestre", "Swedish": null, "English": null, "Portugese": null, "Colour": "Yellow", link: null}, 
+{ "Use": 0, "Family": null, "Latin": "Lavandula", "Swedish": null, "English": null, "Portugese": null, "Colour": "Purple", link: null}, 
+{ "Use": 1, "Family": null, "Latin": "hypericum perforatum", "Swedish": null, "English": null, "Portugese": null, "Colour": "Yellow", link: null}, 
+{ "Use": null, "Family": null, "Latin": null, "Swedish": null, "English": null, "Portugese": null, "Colour": null, link: null}, 
+{ "Use": null, "Family": null, "Latin": null, "Swedish": null, "English": null, "Portugese": null, "Colour": null, link: null}, 
+{ "Use": null, "Family": null, "Latin": null, "Swedish": null, "English": null, "Portugese": null, "Colour": null, link: null}, 
+{ "Use": null, "Family": null, "Latin": null, "Swedish": null, "English": null, "Portugese": null, "Colour": null, link: null}, 
+{ "Use": null, "Family": null, "Latin": null, "Swedish": null, "English": null, "Portugese": null, "Colour": null, link: null}, 
+{ "Use": null, "Family": null, "Latin": "1,2,1,13,1,2,3,1,1", "Swedish": null, "English": null, "Portugese": null, "Colour": null, link: null}];
+
+// Add the species names to selector
+for(let i = 0; i < bees.length; i++) {
+    var selectorB = document.getElementById("Bee species")
+    const Spec = document.createElement("option");
+
+    const name = document.createTextNode(bees[i].Bumblebeespecies);
+    Spec.appendChild(name);
+    selectorB.appendChild(Spec);
+};
+for(let i = 0; i < plants.length; i++) {
+    var selectorP = document.getElementById("Plant species")
+    const Spec = document.createElement("option");
+
+    const name = document.createTextNode(plants[i].Latin);
+    Spec.appendChild(name);
+    selectorP.appendChild(Spec);
+};
+
+// -------------------------------------------------------------------------------------------------------------- //
+// LOCATION permissions and latlon
+var geoBtn = document.querySelector('.enable');
+var revokeBtn = document.querySelector('.revoke');
+geoBtn.onclick = function() {
+  console.log('Permission currently denied; future features of the Permissions API will allow us to request permission here.')
+  console.log('Currently you have to reset the permission state using the browser UI.')
+  console.log('In Firefox it is done with Tools > Page Info > Permissions > Access Your Location.')
+}
+
+revokeBtn.onclick = function() {
+  revokePermission();
+}
+
+// draw the google map, or not
+
+var positionDenied = function() {
+  geoBtn.style.display = 'inline';
+};
+var revealPosition = function(position) {
+
+  var latlon = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+    var lat = document.getElementById("Lat");
+    const LatTxt = document.createElement("option");
+    var latitude = document.createTextNode(position.coords.latitude);
+    LatTxt.appendChild(latitude);
+    lat.appendChild(LatTxt);
+    var lon = document.getElementById("Lon");
+    const LonTxt = document.createElement("option");
+    var longitude = document.createTextNode(position.coords.longitude);
+    LonTxt.appendChild(longitude);
+    lon.appendChild(LonTxt);
+
+};
+
+// images 
+
+for(let i = 0; i < bees.length; i++) {
+    var name = bees[i].Bumblebeespecies;
+    var Bspec = document.getElementById("Bee species").value;
+    var Imgspace = document.getElementById("beeImg");
+    var block = document.createElement("div");
+    var Bimg = document.createElement("img"); Bimg.setAttribute("src", bees[i].link); Bimg.setAttribute("style", "width:95%;margin");
+    if (bees[i].link) {
+        block.appendChild(Bimg);
+        block.appendChild(document.createElement("br"));
+        block.appendChild(document.createTextNode(name));
+        Imgspace.append(block)
+    }
+
+};
+for(let i = 0; i < plants.length; i++) {
+    var name = plants[i].Latin;
+    var Pspec = document.getElementById("Plant species").value;
+    var Imgspace = document.getElementById("plantImg");
+    var block = document.createElement("div"); 
+    var Pimg = document.createElement("img"); Pimg.setAttribute("src", plants[i].link); Pimg.setAttribute("style", "width:95%;");
+    if (plants[i].link) {
+        block.appendChild(Pimg);
+        block.appendChild(document.createElement("br"));
+        block.appendChild(document.createTextNode(name));
+        Imgspace.append(block)
+    }
+};
+var Bimgs = document.getElementById("beeImg")
+var Pimgs = document.getElementById("plantImg")
+
+var plantpage = document.getElementById("showPlants");
+plantpage.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (Pimgs.style.display == "none") {
+  Pimgs.setAttribute("style", "position: absolute;margin-left: 48%;margin-top: -44%; width: 35%;height: 70%;display:block; overflow-y:scroll;");
+  Bimgs.setAttribute("style", "display:none;") }
+  else {
+    Pimgs.setAttribute("style", "display:none;"); 
+}
+});
+var beepage = document.getElementById("showBees");
+beepage.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (Bimgs.style.display == "none") {
+  Bimgs.setAttribute("style", "position: absolute;margin-left: 48%;margin-top: -44%; width: 35%;height: 70%;display:none;display:block;overflow-y:scroll;");
+  Pimgs.setAttribute("style", "display:none;"); }
+  else {Bimgs.setAttribute("style", "display:none;") }
+});
+
+
+// test for geolocation support, provide geolocation settings, determine location of the user's device
+if (!"geolocation" in navigator) {
+  alert("No geolocation available!");
+}
+var geoSettings = {
+  enableHighAccuracy: true,
+  maximumAge        : 30000,
+  timeout           : 20000
+};
+// Start everything off
+function handlePermission() {
+  navigator.permissions.query({name:'geolocation'}).then(function(result) {
+    if (result.state == 'granted') {
+      report(result.state);
+      geoBtn.style.display = 'none';
+    } else if (result.state == 'prompt') {
+      report(result.state);
+      navigator.geolocation.getCurrentPosition(revealPosition,positionDenied,geoSettings);
+    } else if (result.state == 'denied') {
+      report(result.state);
+      geoBtn.style.display = 'inline';
+    }
+    result.onchange = function() {
+      report(result.state);
+    }
+  });
+}
+function revokePermission() {
+  navigator.permissions.revoke({name:'geolocation'}).then(function(result) {
+    report(result.state);
+  });
+}
+function report(state) {
+  console.log('Permission: ' + state);
+}
+handlePermission();
+
+// -------------------------------------------------------------------------------------------------------------- //
+
+// Tabs 
+function openPage(pageName,elmnt,color) {
+
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablink");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].style.backgroundColor = "";
+  }
+  document.getElementById(pageName).style.display = "block";
+  elmnt.style.backgroundColor = color;
+}
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+
+// Download excel file 
+function exportTableToExcel(tableId) {
+  // Get the table element using the provided ID
+  const table = document.getElementById("dataRecord");
+  var rowCount = table.rows.length;
+            let index = table.rows[1].cells.length-2;
+            for (var i = 1; i < rowCount; i++) {
+                table.rows[i].deleteCell(index);
+                table.rows[i].deleteCell(index);}
+  // Extract the HTML content of the table
+  const html = table.outerHTML;
+  // Create a Blob containing the HTML data with Excel MIME type
+  const blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+  // Create a URL for the Blob
+  const url = URL.createObjectURL(blob);
+  // Create a temporary anchor element for downloading
+  const a = document.createElement('a');
+  a.href = url;
+  // Set the desired filename for the downloaded file
+  a.download = "Bumblog"+'.xls';
+  // Simulate a click on the anchor to trigger download
+  a.click();
+  // Release the URL object to free up resources
+  URL.revokeObjectURL(url);
+}
+
+// -------------------------------------------------------------------------------------------------------------- //
+// Handling entries
+let dataForm = document.getElementById("dataForm");
+let enterobs = document.getElementById("enterObs");
+let startbutton = document.getElementById("startbutton");
+const subButton = document.getElementById("enterObs");
+
+var CatList = ["Lat", "Lon", "Bee number","Recording number", "Bee species", "Pollen load", "Plant number", "Plant species", "Revisit plant", "Inside plot", "Distance", "Flower number", "Revisit flower", "Robbing", "Foraging"];
+
+
+
+dataForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  handlePermission();
+  let nowT = new Date().toLocaleTimeString(); 
+  let nowD = new Date().toLocaleDateString(); 
+  
+  const Enterdata =  
+    [{Time: String(nowT), Date: String(nowD), "Lat":'', "Lon":'', "Bee number":'',
+    "Recording number":'', "Bee species":'', "Pollen load":'', 
+    "Plant number":'', "Plant species":'', "Revisit plant":'', 
+    "Inside plot":'', "Distance":'', "Flower number":'', "Revisit flower":'', 
+    "Robbing":'', "Foraging":''}];
+
+    for (let i=0 ; i<CatList.length; i++) {
+    let cat = CatList[i]
+    var entry = document.getElementById(String(CatList[i]))
+    if (entry.type == "checkbox") {
+        if (entry.checked) {
+            Enterdata[0][cat] =  1
+            entry.checked = false} 
+        else {
+            Enterdata[0][cat] = ' '
+        }
+    }
+    else {Enterdata[0][cat] = entry.value;}
+    
+
+    entry.value = "";
+    
+    };
+    DataToTable(Enterdata);
+
+});
+
+
+function DataToTable(data) {
+    const table = document.getElementById("dataRecord");
+            table.setAttribute('border', '1');
+ 
+            const headerRow = document.createElement('tr');
+            Object.keys(data[0]).forEach(key => {
+                const th = document.createElement('th');
+                th.appendChild(document.createTextNode(key));
+                headerRow.appendChild(th);
+            });
+            const th = document.createElement('th');
+                th.appendChild(document.createTextNode("Notes"));
+                headerRow.appendChild(th);
+            if (table.rows.length==0){
+             table.appendChild(headerRow)};
+ 
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                Object.values(item).forEach(value => {
+                    const td = document.createElement('td');
+                    td.appendChild(document.createTextNode(value));
+                    row.appendChild(td);
+                });
+                const td = document.createElement('td');
+                    td.appendChild(document.createTextNode(document.getElementById("Notes").value));
+                    row.appendChild(td);
+                var btnDel = document.createElement('button');
+                    btnDel.innerText="delete";
+                    btnDel.setAttribute("class", "deleteButton");
+                    btnDel.setAttribute("style", "margin-top:-4.5%;margin-left:-13%;position:relative;");
+                    btnDel.addEventListener("click", (e) => {
+                        let checkDel = confirm("Delete entry?");
+                                if (checkDel ==true) {
+                                    const cellplace = e.target.closest("tr");
+                                    table.deleteRow(Number(cellplace.rowIndex));
+                                 }});
+                const tdDel = document.createElement('td');
+                    tdDel.appendChild(btnDel);
+                    tdDel.appendChild(document.createTextNode("      "));
+                    row.appendChild(tdDel);
+                var btnEdt = document.createElement('button');
+                    btnEdt.innerText="edit";
+                    btnEdt.setAttribute("class", "editButton");
+                    btnEdt.setAttribute("style", "margin-top:-4.5%;margin-left:-13%;position:relative;");
+                    btnEdt.setAttribute("id", "editButton"+String(table.rows.length));
+                    btnEdt.addEventListener("click", (e) => {
+                        
+                                    const cellplace = e.target.closest("tr");
+                                    editWindow(table, Number(cellplace.rowIndex));
+                                 });
+                const tdEdt = document.createElement('td');
+                    tdEdt.appendChild(btnEdt);
+                    tdEdt.appendChild(document.createTextNode("     "));
+                    row.appendChild(tdEdt);
+                    row.setAttribute("style", "width:auto")
+                table.appendChild(row);
+                
+                document.getElementById("preview").setAttribute("style", "width:95%;overflow:scroll; margin-left:2%")
+                table.setAttribute("style", "width:90%;overflow:scroll;")
+            });
+            if (table.rows.length==0) {dataRecord.appendChild(table);}
+};
+
+function editWindow(table, whichRow) {
+    var butnID = document.getElementById("editButton"+String(whichRow));
+    var editRow = table.rows[whichRow];
+    if (butnID.innerText == "edit") {
+    butnID.innerText="save";
+    for (let i = 0; i < table.rows[0].cells.length+2; i++) {
+        table.rows[whichRow].cells[i].setAttribute("contenteditable", 'true');
+        editRow.cells[i].setAttribute("style", 'color:red');
+        for (let n = 1; n < table.rows.length; n++) {
+            for (let m = 0; m < table.rows[0].cells.length+2; m++) {
+        table.rows[n].cells[m].setAttribute("style", 'visibility:hidden');}};
+        for (let m = 0; m < table.rows[0].cells.length; m++) {
+        editRow.cells[m].setAttribute("style", 'visibility:visible')};
+        editRow.cells[i].setAttribute("style", 'color:red');
+    }}
+    else if (butnID.innerText == "save") {
+    butnID.innerText="edit";
+    for (let i = 0; i < table.rows[0].cells.length; i++) {
+        table.rows[whichRow].cells[i].setAttribute("contenteditable", 'false');
+    for (let n = 1; n < table.rows.length; n++) {
+            for (let m = 0; m < table.rows[0].cells.length+2; m++) {
+        table.rows[n].cells[m].setAttribute("style", 'visibility:visible');}};
+        editRow.cells[i].setAttribute("style", 'color:black');
+    }};
+};
+
+</script>
+</html>
